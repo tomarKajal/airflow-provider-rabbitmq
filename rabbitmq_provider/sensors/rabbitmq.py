@@ -3,7 +3,7 @@ from airflow.utils.decorators import apply_defaults
 from airflow.triggers.temporal import TimeDeltaTrigger
 from datetime import timedelta, datetime
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
-
+from airflow.configuration import conf
 
 class RabbitMQSensor(BaseSensorOperator):
     """RabbitMQ sensor that monitors a queue for any messages.
@@ -20,12 +20,16 @@ class RabbitMQSensor(BaseSensorOperator):
 
     @apply_defaults
     def __init__(
-        self, queue_name: str, rabbitmq_conn_id: str = "rabbitmq_default", **kwargs
+        self,
+        queue_name: str, 
+        rabbitmq_conn_id: str = "rabbitmq_default", 
+        deferrable: bool = conf.getboolean("operators", "default_deferrable", fallback=False),
+        **kwargs
     ):
         super().__init__(**kwargs)
         self.queue_name = queue_name
         self.rabbitmq_conn_id = rabbitmq_conn_id
-
+        self.deferrable = deferrable
         self._return_value = None
 
     def execute(self, context: dict):

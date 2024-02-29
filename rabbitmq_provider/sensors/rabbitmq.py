@@ -5,7 +5,7 @@ from airflow.triggers.temporal import TimeDeltaTrigger
 from datetime import timedelta, datetime
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 from airflow.configuration import conf
-from typing import Any
+from typing import Any, Dict, Union
 
 class RabbitMQSensor(BaseSensorOperator):
     """RabbitMQ sensor that monitors a queue for any messages.
@@ -54,7 +54,7 @@ class RabbitMQSensor(BaseSensorOperator):
         super().execute(context)
         return self._return_value'''
     
-    def execute_complete(self,context: dict,event: dict | None = None) -> None:
+    def execute_complete(self,context: dict,event: Union[Dict[str, Any], None] = None) -> None:
         logging.info("--- Inside execute complete ----")
         return
 

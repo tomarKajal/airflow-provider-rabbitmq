@@ -1,6 +1,7 @@
 from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-
+from airflow.triggers.temporal import TimeDeltaTrigger
+from datetime import timedelta, datetime
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 
 
@@ -29,6 +30,20 @@ class RabbitMQSensor(BaseSensorOperator):
 
     def execute(self, context: dict):
         """Overridden to allow messages to be passed"""
+        if not self.deferrable:
+            super().execute(context)
+            return self._return_value
+        else:
+            if not self.poke(context=context):
+                self._defer()
+
+    def _defer(self) -> None:
+        self.defer(
+            trigger=TimeDeltaTrigger(delta=timedelta(seconds=120)),
+            method_name="execute_complete",
+        )
+
+    def execute_complete(self, context: dict):
         super().execute(context)
         return self._return_value
 

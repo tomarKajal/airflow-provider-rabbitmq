@@ -1,9 +1,11 @@
+import logging
 from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.triggers.temporal import TimeDeltaTrigger
 from datetime import timedelta, datetime
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 from airflow.configuration import conf
+from typing import Any
 
 class RabbitMQSensor(BaseSensorOperator):
     """RabbitMQ sensor that monitors a queue for any messages.
@@ -34,6 +36,7 @@ class RabbitMQSensor(BaseSensorOperator):
 
     def execute(self, context: dict):
         """Overridden to allow messages to be passed"""
+        logging.info("--- Inside execute method ----")
         if not self.deferrable:
             super().execute(context)
             return self._return_value
@@ -47,9 +50,17 @@ class RabbitMQSensor(BaseSensorOperator):
             method_name="execute_complete",
         )
 
-    def execute_complete(self, context: dict):
+    '''def execute_complete(self, context: dict):
         super().execute(context)
-        return self._return_value
+        return self._return_value'''
+    
+    def execute_complete(
+        self,
+        context: dict,
+        event: dict[str, Any] | None = None,
+    ) -> None:
+        logging.info("--- Inside execute complete ----")
+        return
 
     def poke(self, context: dict):
         hook = RabbitMQHook(self.rabbitmq_conn_id)

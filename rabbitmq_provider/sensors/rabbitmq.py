@@ -46,7 +46,7 @@ class RabbitMQSensor(BaseSensorOperator):
 
     def _defer(self) -> None:
         self.defer(
-            trigger=TimeDeltaTrigger(delta=timedelta(seconds=60)),
+            trigger=TimeDeltaTrigger(delta=timedelta(minutes=5)),
             method_name="execute_complete",
         )
 

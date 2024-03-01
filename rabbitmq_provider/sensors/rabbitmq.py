@@ -55,6 +55,7 @@ class RabbitMQSensor(BaseSensorOperator):
         return self._return_value'''
     
     def execute_complete(self,context: dict,event: Union[Dict[str, Any], None] = None) -> None:
+        logging.info("event======>",event)
         logging.info("--- Inside execute complete ----")
         return
 

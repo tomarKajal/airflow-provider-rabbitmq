@@ -6,7 +6,11 @@ import asyncio
 
 class RabbitMQTriggers(BaseTrigger):
     def __init__(
-        self, queue_name: str, rabbitmq_conn_id: str = "rabbitmq_default", **kwargs
+        self,
+        queue_name: str,
+        rabbitmq_conn_id: str = "rabbitmq_default",
+        poke_interval: float = 5.0, 
+        **kwargs
     ):
         super().__init__(**kwargs)
         self.queue_name = queue_name

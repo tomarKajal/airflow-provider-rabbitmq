@@ -4,7 +4,7 @@ from airflow.utils.decorators import apply_defaults
 from airflow.triggers.temporal import TimeDeltaTrigger
 from datetime import timedelta, datetime
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
-from rabbitmq_provider.triggers import RabbitMQTriggers
+from rabbitmq_provider.triggers.rabbitmq import RabbitMQTriggers
 from airflow.exceptions import AirflowException, AirflowProviderDeprecationWarning, AirflowSkipException
 from airflow.configuration import conf
 from typing import Any, Dict, Union

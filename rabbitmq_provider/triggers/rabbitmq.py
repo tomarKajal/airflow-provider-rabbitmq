@@ -1,9 +1,8 @@
 from typing import Any, AsyncIterator
 from airflow.triggers.base import BaseTrigger, TriggerEvent
 from airflow.configuration import conf
-import asyncio
-from __future__ import annotations
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
+import asyncio
 
 class RabbitMQTriggers(BaseTrigger):
     def __init__(

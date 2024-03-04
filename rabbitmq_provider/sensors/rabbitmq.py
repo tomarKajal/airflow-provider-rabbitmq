@@ -58,8 +58,11 @@ class RabbitMQSensor(BaseSensorOperator):
 
     def _defer(self) -> None:
         self.defer(
-            # trigger=TimeDeltaTrigger(delta=timedelta(minutes=5)),
-            trigger=RabbitMQTriggers(self.queue_name, self.rabbitmq_conn_id),
+            trigger=RabbitMQTriggers(
+                queue_name=self.queue_name,
+                rabbitmq_conn_id=self.rabbitmq_conn_id,
+                poke_interval=self.poke_interval,
+            ),
             method_name="execute_complete",
         )
 

@@ -17,7 +17,7 @@ class RabbitMQTriggers(BaseTrigger):
         self.poke_interval = poke_interval
         self._return_value = None
 
-def serialize(self) -> tuple[str,dict[str,Any]]:
+def serialize(self) -> tuple[str, dict[str, Any]]:
     return (
         "airflow.providers.rabbitmq.triggers.RabbitMQTriggers",
         {

@@ -5,9 +5,14 @@ from airflow.triggers.temporal import TimeDeltaTrigger
 from datetime import timedelta, datetime
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 from rabbitmq_provider.triggers.rabbitmq import RabbitMQTriggers
-from airflow.exceptions import AirflowException, AirflowProviderDeprecationWarning, AirflowSkipException
+from airflow.exceptions import (
+    AirflowException,
+    AirflowProviderDeprecationWarning,
+    AirflowSkipException,
+)
 from airflow.configuration import conf
 from typing import Any, Dict, Union
+
 
 class RabbitMQSensor(BaseSensorOperator):
     """RabbitMQ sensor that monitors a queue for any messages.
@@ -25,9 +30,11 @@ class RabbitMQSensor(BaseSensorOperator):
     @apply_defaults
     def __init__(
         self,
-        queue_name: str, 
-        rabbitmq_conn_id: str = "rabbitmq_default", 
-        deferrable: bool = conf.getboolean("operators", "default_deferrable", fallback=False),
+        queue_name: str,
+        rabbitmq_conn_id: str = "rabbitmq_default",
+        deferrable: bool = conf.getboolean(
+            "operators", "default_deferrable", fallback=False
+        ),
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -49,15 +56,16 @@ class RabbitMQSensor(BaseSensorOperator):
                 super().execute(context)
                 return self._return_value
 
-
     def _defer(self) -> None:
         self.defer(
-            #trigger=TimeDeltaTrigger(delta=timedelta(minutes=5)),
-            trigger=RabbitMQTriggers(self.queue_name,self.rabbitmq_conn_id),
+            # trigger=TimeDeltaTrigger(delta=timedelta(minutes=5)),
+            trigger=RabbitMQTriggers(self.queue_name, self.rabbitmq_conn_id),
             method_name="execute_complete",
         )
 
-    def execute_complete(self, context: dict, event: Union[Dict[str, Any], None] = None) -> None:
+    def execute_complete(
+        self, context: dict, event: Union[Dict[str, Any], None] = None
+    ) -> None:
         """
         Execute when a message is received from RabbitMQ.
 
@@ -77,7 +85,6 @@ class RabbitMQSensor(BaseSensorOperator):
             if self.soft_fail:
                 raise AirflowSkipException(event["message"])
             raise AirflowException(event["message"])
-
 
     def poke(self, context: dict):
         hook = RabbitMQHook(self.rabbitmq_conn_id)

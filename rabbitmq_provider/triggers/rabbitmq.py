@@ -4,12 +4,10 @@ from airflow.configuration import conf
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 import asyncio
 
+
 class RabbitMQTriggers(BaseTrigger):
     def __init__(
-        self,
-        queue_name: str, 
-        rabbitmq_conn_id: str = "rabbitmq_default",
-        **kwargs
+        self, queue_name: str, rabbitmq_conn_id: str = "rabbitmq_default", **kwargs
     ):
         super().__init__(**kwargs)
         self.queue_name = queue_name
@@ -17,15 +15,17 @@ class RabbitMQTriggers(BaseTrigger):
         self.poke_interval = poke_interval
         self._return_value = None
 
+
 def serialize(self):
     return (
         "airflow.providers.rabbitmq.triggers.RabbitMQTriggers",
         {
             "queue_name": self.queue_name,
             "rabbitmq_conn_id": self.rabbitmq_conn_id,
-            "poke_interval":self.poke_interval,
-        }
+            "poke_interval": self.poke_interval,
+        },
     )
+
 
 async def run(self) -> AsyncIterator[TriggerEvent]:
     """Asynchronously check for messages in RabbitMQ."""

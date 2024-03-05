@@ -1,13 +1,10 @@
-import logging
 from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from airflow.triggers.temporal import TimeDeltaTrigger
-from datetime import timedelta, datetime
+from datetime import timedelta
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 from rabbitmq_provider.triggers.rabbitmq import RabbitMQTriggers
 from airflow.exceptions import (
     AirflowException,
-    AirflowProviderDeprecationWarning,
     AirflowSkipException,
 )
 from airflow.configuration import conf
@@ -45,7 +42,7 @@ class RabbitMQSensor(BaseSensorOperator):
 
     def execute(self, context: dict):
         """Overridden to allow messages to be passed"""
-        logging.info("--- Inside execute method ----")
+        self.log.info("--- Inside execute method ----")
         if not self.deferrable:
             super().execute(context)
             return self._return_value
@@ -56,13 +53,14 @@ class RabbitMQSensor(BaseSensorOperator):
                 super().execute(context)
                 return self._return_value
 
-    def _defer(self,context: dict) -> None:
+    def _defer(self, context: dict) -> None:
         self.defer(
+            timeout=timedelta(seconds=self.timeout),
             trigger=RabbitMQTriggers(
                 queue_name=self.queue_name,
                 rabbitmq_conn_id=self.rabbitmq_conn_id,
                 poke_interval=self.poke_interval,
-                context=context,  
+                context=context,
             ),
             method_name="execute_complete",
         )
@@ -72,18 +70,15 @@ class RabbitMQSensor(BaseSensorOperator):
     ) -> None:
         """
         Execute when a message is received from RabbitMQ.
-
         Relies on event data to determine success or error.
         """
         if event["status"] == "running":
-            # Assuming data is in "data" field of the event
             data = event.get("data", None)
             if data:
                 self.log.info("Successfully processed message from RabbitMQ: %s", data)
             else:
                 self.log.error("Received empty message from RabbitMQ")
         elif event["status"] == "error":
-            # TODO: remove this if block when min_airflow_version is set to higher than 2.7.1
             if self.soft_fail:
                 raise AirflowSkipException(event["message"])
             raise AirflowException(event["message"])

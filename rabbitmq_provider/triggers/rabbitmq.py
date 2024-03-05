@@ -3,7 +3,6 @@ from airflow.triggers.base import BaseTrigger, TriggerEvent
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 import asyncio
 
-
 class RabbitMQTriggers(BaseTrigger):
     def __init__(
         self,
@@ -33,7 +32,7 @@ class RabbitMQTriggers(BaseTrigger):
         """Asynchronously check for messages in RabbitMQ."""
         try:
             while True:
-                if await self.poke_coroutine(self.context):  # Call the asynchronous poke function
+                if await self.poke_coroutine(self.context):  
                     yield TriggerEvent(
                         {"status": "running", "data": self._return_value}
                     )

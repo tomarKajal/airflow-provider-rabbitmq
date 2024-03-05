@@ -20,7 +20,7 @@ class RabbitMQTriggers(BaseTrigger):
 
     def serialize(self):
         return (
-            "airflow.providers.rabbitmq.triggers.RabbitMQTriggers",
+            "rabbitmq_provider.triggers.rabbitmq.RabbitMQTriggers",
             {
                 "queue_name": self.queue_name,
                 "rabbitmq_conn_id": self.rabbitmq_conn_id,

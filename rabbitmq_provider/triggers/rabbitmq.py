@@ -33,7 +33,7 @@ class RabbitMQTriggers(BaseTrigger):
         """Asynchronously check for messages in RabbitMQ."""
         try:
             while True:
-                if await self.poke(self.context):  # Call the asynchronous poke function
+                if await self.poke_coroutine(self.context):  # Call the asynchronous poke function
                     yield TriggerEvent(
                         {"status": "running", "data": self._return_value}
                     )
@@ -43,16 +43,19 @@ class RabbitMQTriggers(BaseTrigger):
         except Exception as e:
             yield TriggerEvent({"status": "error", "message": str(e)})
 
-            
-    async def poke(self, context: dict):
+    async def poke_coroutine(self, context: dict):
+        result = self.poke(context)  
+        return result
+       
+    def poke(self, context: dict):
         try:
-            async with RabbitMQHook(self.rabbitmq_conn_id) as hook:
-                message = await hook.pull(self.queue_name)
-                if message is not None:
-                    self._return_value = message
-                    return True
-                else:
-                    return False
+            hook = RabbitMQHook(self.rabbitmq_conn_id)
+            message = hook.pull(self.queue_name)
+            if message is not None:
+                self._return_value = message
+                return True
+            else:
+                return False
         except Exception as e:
             self.log.exception("An error occurred in the poke method.")
             raise Exception(f"Error in poke method: {str(e)}")

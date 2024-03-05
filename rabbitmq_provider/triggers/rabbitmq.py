@@ -1,5 +1,6 @@
 from typing import AsyncIterator
-from airflow.triggers.base import BaseTrigger, TriggerEvent,TriggerFailed
+from airflow.triggers.base import BaseTrigger, TriggerEvent
+from airflow.exceptions import TriggerFailed
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 import asyncio
 

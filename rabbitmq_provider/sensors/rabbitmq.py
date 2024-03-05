@@ -79,8 +79,6 @@ class RabbitMQSensor(BaseSensorOperator):
             # Assuming data is in "data" field of the event
             data = event.get("data", None)
             if data:
-                # Process the received data from RabbitMQ (replace with your logic)
-                # ... your processing logic here ...
                 self.log.info("Successfully processed message from RabbitMQ: %s", data)
             else:
                 self.log.error("Received empty message from RabbitMQ")

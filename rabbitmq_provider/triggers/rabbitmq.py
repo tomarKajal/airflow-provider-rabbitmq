@@ -1,6 +1,5 @@
 from typing import AsyncIterator
 from airflow.triggers.base import BaseTrigger, TriggerEvent
-from airflow.exceptions import TriggerFailed
 from rabbitmq_provider.hooks.rabbitmq import RabbitMQHook
 import asyncio
 
@@ -56,4 +55,4 @@ class RabbitMQTriggers(BaseTrigger):
                     return False
         except Exception as e:
             self.log.exception("An error occurred in the poke method.")
-            raise TriggerFailed(f"Error in poke method: {str(e)}")
+            raise Exception(f"Error in poke method: {str(e)}")

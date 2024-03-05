@@ -9,13 +9,14 @@ class RabbitMQTriggers(BaseTrigger):
         self,
         queue_name: str,
         rabbitmq_conn_id: str = "rabbitmq_default",
-        poke_interval: float = 5.0, 
-        **kwargs
+        poke_interval: float = 5.0,
+        context=None,
     ):
-        super().__init__(**kwargs)
+        super().__init__()
         self.queue_name = queue_name
         self.rabbitmq_conn_id = rabbitmq_conn_id
         self.poke_interval = poke_interval
+        self.context = context
         self._return_value = None
 
     def serialize(self):
@@ -32,7 +33,7 @@ class RabbitMQTriggers(BaseTrigger):
         """Asynchronously check for messages in RabbitMQ."""
         try:
             while True:
-                if await self.poke(context={}):  # Call the asynchronous poke function
+                if await self.poke(self.context):  # Call the asynchronous poke function
                     yield TriggerEvent(
                         {"status": "running", "data": self._return_value}
                     )

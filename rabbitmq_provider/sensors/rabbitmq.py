@@ -51,17 +51,18 @@ class RabbitMQSensor(BaseSensorOperator):
             return self._return_value
         else:
             if not self.poke(context=context):
-                self._defer()
+                self._defer(context)
             else:
                 super().execute(context)
                 return self._return_value
 
-    def _defer(self) -> None:
+    def _defer(self,context: dict) -> None:
         self.defer(
             trigger=RabbitMQTriggers(
                 queue_name=self.queue_name,
                 rabbitmq_conn_id=self.rabbitmq_conn_id,
                 poke_interval=self.poke_interval,
+                context=context,  
             ),
             method_name="execute_complete",
         )
